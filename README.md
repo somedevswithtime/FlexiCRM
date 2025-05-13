@@ -1,4 +1,4 @@
-# FlexiCRM – Modular CRM for Freelancers, Job Hunters & Client Managers
+# FlexiCRM – Modular CRM
 
 🌟 **Motivation**: A modular applications with Next.js and modern web technologies. Solution for different user workflows.
 
