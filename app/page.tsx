@@ -1,7 +1,11 @@
+import Landing from "./components/Landing";
+
 export default function Home() {
   return (
-    <main className="flex h-screen items-center justify-center bg-gray-100">
-      <h1 className="text-3xl font-bold text-blue-600">FlexiCRM is Live 🎉</h1>
-    </main>
+    <div className="landing-page p-6">
+      <div className="max-w-4xl mx-auto">
+        <Landing />
+      </div>
+    </div>
   );
 }
