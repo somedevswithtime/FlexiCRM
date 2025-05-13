@@ -37,3 +37,13 @@ npm run dev
 3. Commit changes (git commit -m 'FEAT: Add some amazing feature')
 4. Push to branch (git push origin feature/AmazingFeature)
 5. Merge to main or ask for pull request
+
+_Commit Guidelines_
+
+- _FEAT: (new feature for the user, not a new feature for build script)_
+- _FIX: (bug fix)_
+- _DOC: (changes to the documentation)_
+- _STYLE: (formatting, missing semi colons, etc; no production code change)_
+- _REFAC: (refactoring production code, eg. renaming a variable)_
+- _TEST: (adding missing tests, refactoring tests; no production code change)_
+- _CHORE: (updating grunt tasks etc; no production code change)_
