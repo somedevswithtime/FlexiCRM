@@ -1,44 +1,56 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap");
 
-/* Your existing theme variables + dark mode */
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #111111;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #f5f5f5;
   }
 }
 
-/* Base styles with your custom fonts */
 @layer base {
+  html,
   body {
-    background: var(--background);
+    font-family: var(--font-sans);
+    background-color: var(--background);
     color: var(--foreground);
-    font-family: var(--font-sans, Arial), sans-serif;
   }
+
+  h1,
+  h2,
+  h3 {
+    font-weight: 700;
+  }
+
   code {
-    font-family: var(--font-mono, monospace);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   }
 }
 
-/* New component classes */
 @layer components {
   .landing-page {
-    @apply min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 
-           dark:from-gray-900 dark:to-blue-900;
+    @apply min-h-screen bg-gradient-to-br from-white to-blue-50 dark:from-gray-900 dark:to-slate-900;
   }
+
   .card {
-    @apply bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm 
-           hover:shadow-md transition-shadow;
+    @apply bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200 border dark:border-gray-700;
   }
+
   .heading-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r 
-           from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400;
+  }
+
+  .text-subtle {
+    @apply text-gray-600 dark:text-gray-400;
+  }
+
+  .footer-note {
+    @apply text-sm text-gray-500 dark:text-gray-400 mt-4;
   }
 }
