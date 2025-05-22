@@ -1,4 +1,4 @@
-import type { Player } from "./types";
+import type { Player } from "../../types/dndCRM/types";
 
 export const mockPlayers: Player[] = [
   {

@@ -1,6 +1,6 @@
 "use client";
 
-import type { Player } from "@lib/dndmanager/types";
+import type { Player } from "@typeDefs/dndCRM";
 
 interface PlayerDetailProps {
   player: Player;
