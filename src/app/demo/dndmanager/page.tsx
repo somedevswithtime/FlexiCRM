@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PlayerTable } from "@components/dndmanager/PlaterTable";
+import { PlayerTable } from "@/src/components/dndmanager/PlayerTable";
 import { PlayerDetail } from "@components/dndmanager/PlayerDetail";
 import { mockPlayers } from "@lib/dndmanager/data";
 
