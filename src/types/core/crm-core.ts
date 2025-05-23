@@ -45,6 +45,9 @@ export interface EntitySchema extends BaseEntity {
  */
 export interface FieldValue {
   fieldId: string; // FieldDefinition.id
+  name?: string; // User-friendly name
+  type?: FieldType;
+  tableVisible?: boolean; // Need to investigate clever ways of controlling UI visuals
   value: any; // TODO: needs to be strongly typed in future iteration
   //                   ties to FieldTypes
 }
@@ -58,7 +61,7 @@ export interface EntityInstance extends BaseEntity {
    * Some entities might derive their name from a specific field.
    */
   name?: string; // Primary display name, title for the instance
-  fieldValues: FieldValue[]; // For flexibility
+  fieldValues: FieldValue[]; // For flexibility value is at any, faster mvp
 }
 
 // DEPRECATED
@@ -79,38 +82,6 @@ export type Contact = BaseEntity & {
     customFields?: Record<string, unknown>;
   };
 };
-/*
-// --- Conceptual Example using EntitySchema ---
-// This is how a 'Contact' could be defined using the new generic system:
-const contactSchemaExample: EntitySchema = {
-  id: 'contact_schema_v1',
-  name: 'Contact',
-  createdAt: Date.now(),
-  fields: [
-    { id: 'contact_field_role', name: 'Role', type: 'enum', isRequired: true, options: [
-        {id: 'role_business', name: 'Business'},
-        {id: 'role_personal', name: 'Personal'},
-        {id: 'role_professional', name: 'Professional'}
-      ], description: 'Discriminator for the type of contact.' },
-    { id: 'contact_field_name', name: 'Full Name', type: 'text', isRequired: true },
-    { id: 'contact_field_email', name: 'Email', type: 'text', description: 'Primary email address.' },
-    { id: 'contact_field_phone', name: 'Phone', type: 'text', description: 'Primary phone number.' },
-    { id: 'contact_field_tags', name: 'Tags', type: 'text', description: 'Comma-separated list of tags. Could also be a multi-select enum or a relation to a Tag entity if tags were more complex.' },
-    // For context fields, they could be broken out or handled as structured text:
-    { id: 'contact_field_company', name: 'Company', type: 'text', description: 'Associated company name.' },
-    { id: 'contact_field_relationship', name: 'Relationship', type: 'text', description: 'Nature of the relationship.' },
-    { id: 'contact_field_lastcontact', name: 'Last Contact Date', type: 'date' },
-    // customFields: Record<string, unknown> is tricky.
-    // Option 1: A single 'text' or 'markdown' field storing JSON.
-    { id: 'contact_field_customfields_json', name: 'Custom Fields (JSON)', type: 'text', description: 'Custom data stored as a JSON string.' },
-    // Option 2: If custom fields have a somewhat predictable structure, they could be added dynamically
-    // or have a predefined set like 'custom_text_1', 'custom_number_1' etc.
-    // For this example, we'll assume a JSON string representation for simplicity.
-  ],
-  icon: 'user_icon_svg_string_or_name',
-};
-*/
-
 /**
  * Defines the overall state structure for the CRM.
  * This will hold all entity schemas (the "blueprints" for data types)

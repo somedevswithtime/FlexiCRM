@@ -1,12 +1,15 @@
 "use client";
-
-import type { Player } from "@typeDefs/dndCRM";
+// Deperecated, todo: remove
+// import type { Player } from "@typeDefs/dndCRM";
+import type { EntityInstance } from "@typeDefs/core";
 
 interface PlayerTableProps {
-  players: Player[];
+  players: EntityInstance[];
   onSelect: (id: string) => void;
 }
 
+// TODO: build generic table, layout determined by schema
+//       should it be derived by fieldValues?
 export function PlayerTable({ players, onSelect }: PlayerTableProps) {
   return (
     <div className="overflow-x-auto border border-zinc-300 dark:border-zinc-700 rounded">
@@ -25,9 +28,13 @@ export function PlayerTable({ players, onSelect }: PlayerTableProps) {
               className="cursor-pointer hover:bg-zinc-200 dark:hover:bg-zinc-700"
               onClick={() => onSelect(player.id)}
             >
-              <td className="px-4 py-2">{player.name}</td>
-              <td className="px-4 py-2">{player.class}</td>
-              <td className="px-4 py-2">{player.campaign}</td>
+              {player.fieldValues
+                .filter(({ tableVisible }) => tableVisible)
+                .map(({ fieldId, value }) => (
+                  <td key={fieldId} className="px-4 py-2">
+                    {value}
+                  </td>
+                ))}
             </tr>
           ))}
         </tbody>

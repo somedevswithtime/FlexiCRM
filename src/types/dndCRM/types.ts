@@ -1,3 +1,5 @@
+// DEPRECATED
+// TODO: remove
 export interface Player {
   id: string;
   name: string;
