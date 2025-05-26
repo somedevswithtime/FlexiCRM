@@ -1,4 +1,4 @@
-import type { EntitySchema } from "@/src/core/types";
+import type { EntitySchema } from "@core/types";
 /**
  * Ideally, should be defined on backend or stored.
  * Hardcoded in for mvp.

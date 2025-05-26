@@ -1,7 +1,7 @@
 "use client";
 
-import { filterFieldValuesByFieldIdSubstrings as filterBySubstrings } from "@lib/functions";
-import type { EntityInstance } from "@typeDefs/core";
+import { filterFieldValuesByFieldIdSubstrings as filterBySubstrings } from "@/src/lib/utils";
+import type { EntityInstance } from "@/src/core/types";
 
 interface PlayerDetailProps {
   player: EntityInstance;

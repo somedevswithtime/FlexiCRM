@@ -3,6 +3,7 @@ import Link from "next/link";
 import LandHeader from "./LandHeader";
 import LandFooter from "./LandFooter";
 // todo: refactor links in here
+// todo: redo landing, messy
 const Landing: FC = () => {
   return (
     <>
@@ -18,7 +19,7 @@ const Landing: FC = () => {
             <p className="text-gray-600">Organize applications</p>
           </div>
           <div className="card">
-            <Link href="/demo/dndmanager">
+            <Link href="/demo/dungeonsdragons">
               <h2 className="text-xl font-semibold mb-3">For Gamers</h2>
               <p className="text-gray-600">
                 Manage gaming sessions, click here

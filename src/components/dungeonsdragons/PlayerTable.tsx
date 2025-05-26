@@ -1,7 +1,7 @@
 "use client";
 // Deperecated, todo: remove
 // import type { Player } from "@typeDefs/dndCRM";
-import type { EntityInstance } from "@typeDefs/core";
+import type { EntityInstance } from "@/src/core/types";
 
 interface PlayerTableProps {
   players: EntityInstance[];

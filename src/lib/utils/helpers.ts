@@ -1,4 +1,4 @@
-import { FieldValue } from "@typeDefs/core";
+import { FieldValue } from "@/src/core/types";
 
 // TODO: check in future to get rid of function
 // TODO: better naming convention?

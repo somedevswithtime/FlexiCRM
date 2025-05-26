@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { PlayerTable } from "@components/dndmanager/PlayerTable";
-import { PlayerDetail } from "@components/dndmanager/PlayerDetail";
-import { mockedPlayers } from "@lib/dndCRM/data";
+import { PlayerTable } from "@/src/components/dungeonsdragons/PlayerTable";
+import { PlayerDetail } from "@/src/components/dungeonsdragons/PlayerDetail";
+import { mockedPlayers } from "@/src/lib/mocks/dungeonsdragons/constants";
 
 export default function DnDManagerPage() {
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
