@@ -1,15 +1,5 @@
 import { supabase } from "../lib/supabaseClient";
-// Assuming your crm-core.ts types can be imported or are defined here
-// For example: import { EntitySchema } from '../../../client/src/core/types/crm-core';
-// Adjust path as needed if you move client code. For now, let's define a placeholder.
-
-interface EntitySchema {
-  // Placeholder
-  id: string;
-  name: string;
-  fields: any[]; // Replace 'any' with your actual FieldDefinition type
-  // ... other properties from your crm-core.ts EntitySchema
-}
+import { EntitySchema } from "../lib/crm-core";
 
 export const getAllSchemas = async (): Promise<EntitySchema[]> => {
   const { data, error } = await supabase.from("entity_schemas").select("*");
