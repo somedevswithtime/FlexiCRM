@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { PlayerTable } from "@/src/components/dungeonsdragons/PlayerTable";
 import { PlayerDetail } from "@/src/components/dungeonsdragons/PlayerDetail";
-import { mockedPlayers } from "@/src/lib/mocks/dungeonsdragons/constants";
+import { mockedPlayers } from "@lib/mocks/dungeonsdragons/constants";
+import { playerSchema } from "@lib/mocks/dungeonsdragons/schemas";
 
 export default function DnDManagerPage() {
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
@@ -14,8 +15,14 @@ export default function DnDManagerPage() {
     <main className="min-h-screen bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 p-6">
       <h1 className="text-2xl font-bold mb-4">D&D Player Manager</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <PlayerTable players={mockedPlayers} onSelect={setSelectedPlayerId} />
-        {selectedPlayer && <PlayerDetail player={selectedPlayer} />}
+        <PlayerTable
+          players={mockedPlayers}
+          onSelect={setSelectedPlayerId}
+          schema={playerSchema}
+        />
+        {selectedPlayer && (
+          <PlayerDetail player={selectedPlayer} schema={playerSchema} />
+        )}
       </div>
     </main>
   );

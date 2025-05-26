@@ -3,6 +3,7 @@ interface BaseEntity {
   createdAt: number; // Unix timestamp
   updatedAt?: number;
 }
+
 /**
  * Defines the possible data types for a field.
  */
@@ -27,7 +28,19 @@ export interface FieldDefinition {
   description?: string; // Tooltip, helper usage
   options?: { id: string; name: string }[]; // list implementations
   relatedEntitySchemaId?: string; // (ie if this field is "Assigned To" on a Task, this might be "userSchemaId")
+  // UI hints
+  uiGroup?: string; // Group name for organizing fields in UI (e.g., "Basic Info", "Stats")
+  isTableColumn?: boolean; // Whether this field should be displayed as a column in a table view
+  defaultSortOrder?: "asc" | "desc"; // Default sort order for this field in table views
+  uiControlType?:
+    | "text"
+    | "textarea"
+    | "number"
+    | "date"
+    | "select"
+    | "checkbox"; // Preferred UI control for editing
 }
+
 /**
  * Describes the structure of an entity type.
  * Re-uses BaseEntity for id, createdAt, updatedAt.
@@ -40,17 +53,68 @@ export interface EntitySchema extends BaseEntity {
   icon?: string;
   // TODO: maybe an EntitySchema should inherently have more details
 }
-/**
- * Stores the actual value of a field in an entity instance.
- */
-export interface FieldValue {
-  fieldId: string; // FieldDefinition.id
-  name?: string; // User-friendly name
-  type?: FieldType;
-  tableVisible?: boolean; // Need to investigate clever ways of controlling UI visuals
-  value: any; // TODO: needs to be strongly typed in future iteration
-  //                   ties to FieldTypes
+
+// Base interface for all field value types
+interface BaseFieldValue {
+  fieldId: string; // Corresponds to FieldDefinition.id
+  name?: string; // User-friendly name, might be redundant if always looked up from schema
+  tableVisible?: boolean; // UI hint
 }
+
+export interface TextFieldValue extends BaseFieldValue {
+  type: "text";
+  value: string;
+}
+
+export interface NumberFieldValue extends BaseFieldValue {
+  type: "number";
+  value: number;
+}
+
+export interface DateFieldValue extends BaseFieldValue {
+  type: "date";
+  value: string; // using string for now
+}
+
+export interface BooleanFieldValue extends BaseFieldValue {
+  type: "boolean";
+  value: boolean;
+}
+
+export interface RelationFieldValue extends BaseFieldValue {
+  type: "relation";
+  value: string; // ID of the related EntityInstance
+}
+
+export interface UserFieldValue extends BaseFieldValue {
+  type: "user";
+  value: string; // User ID
+}
+
+export interface EnumFieldValue extends BaseFieldValue {
+  type: "enum";
+  value: string; // ID of the selected option from FieldDefinition.options
+}
+
+export interface UrlFieldValue extends BaseFieldValue {
+  type: "url";
+  value: string;
+}
+
+/**
+ * A discriminated union of all possible field value types.
+ * The 'type' property is the discriminant.
+ */
+export type TypedFieldValue =
+  | TextFieldValue
+  | NumberFieldValue
+  | DateFieldValue
+  | BooleanFieldValue
+  | RelationFieldValue
+  | UserFieldValue
+  | EnumFieldValue
+  | UrlFieldValue;
+
 /**
  * Represents an actual data record.
  * Re-uses BaseEntity for id, createdAt, updatedAt.
@@ -61,27 +125,9 @@ export interface EntityInstance extends BaseEntity {
    * Some entities might derive their name from a specific field.
    */
   name?: string; // Primary display name, title for the instance
-  fieldValues: FieldValue[]; // For flexibility value is at any, faster mvp
+  fieldValues: TypedFieldValue[]; // Now uses the strongly-typed discriminated union
 }
 
-// DEPRECATED
-// Left to illustrate example below
-// TODO: remove in future
-export type Contact = BaseEntity & {
-  role: "business" | "personal" | "professional"; // Discriminator
-  name: string;
-  email?: string;
-  phone?: string;
-  tags: string[];
-
-  // Generic context field to add details, maybe make specific context per CRM?
-  context?: {
-    company?: string;
-    relationship?: string;
-    lastContact?: number; // Unix timestamp
-    customFields?: Record<string, unknown>;
-  };
-};
 /**
  * Defines the overall state structure for the CRM.
  * This will hold all entity schemas (the "blueprints" for data types)
