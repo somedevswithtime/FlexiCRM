@@ -1,0 +1,19 @@
+{
+  "name": "flexicrm-server",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "ts-node-dev src/index.ts",
+    "build": "echo \"Add your build script here, e.g., tsc\"",
+    "start": "echo \"Add your start script here, e.g., node dist/index.js\""
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.0.0",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.0.0"
+  }
+}
