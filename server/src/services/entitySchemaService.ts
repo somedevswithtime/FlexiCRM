@@ -27,6 +27,3 @@ export const getSchemaById = async (
   }
   return data as EntitySchema | null;
 };
-
-// Add more functions as needed: createSchema, updateSchema, deleteSchema
-// Remember to handle permissions and user roles for these operations.

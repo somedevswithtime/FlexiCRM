@@ -1,20 +1,29 @@
+import express, { Request, Response } from "express";
 import { getAllSchemas } from "./services/entitySchemaService";
+
+const app = express();
+const port = process.env.PORT || 3001;
 
 async function main() {
   console.log("FlexiCRM Server Starting...");
-  // Example: Fetch all schemas on start (for demonstration)
-  try {
-    const schemas = await getAllSchemas();
-    // todo: clean this up? better sanity checks?
-    console.log("Available Schemas:", JSON.stringify(schemas, null, 2));
-  } catch (error) {
-    console.error("Failed to fetch schemas on start:", error);
-  }
 
-  // Implement Express or something here, sanity checks
-  console.log(
-    "Server setup complete. Listening for requests (not really, this is a placeholder)..."
-  );
+  app.get("/api", (req: Request, res: Response) => {
+    res.json({ message: "FlexiCRM Backend is running!" });
+  });
+
+  app.get("/api/schemas", async (req: Request, res: Response) => {
+    try {
+      const schemas = await getAllSchemas();
+      res.status(200).json(schemas);
+    } catch (error) {
+      console.error("Error fetching schemas:", error);
+      res.status(500).json({ message: "Failed to fetch schemas" });
+    }
+  });
+
+  app.listen(port, () => {
+    console.log(`Server is listening on port ${port}`);
+  });
 }
 
 main().catch(console.error);
