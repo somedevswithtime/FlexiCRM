@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "ts-node-dev src/index.ts",
-    "build": "echo \"Add your build script here, e.g., tsc\"",
-    "start": "echo \"Add your start script here, e.g., node dist/index.js\""
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.0.0",
