@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
-import { authMiddleware } from "@/middleware/authMiddleware"; // Corrected import
+import { authMiddleware } from "@/middleware/authMiddleware";
+import cors from "cors";
 import schemaRoutes from "@/routes/schemaRoutes"; // Added import
 
 const app = express();
@@ -8,6 +9,12 @@ const port = process.env.PORT || 3001;
 async function main() {
   console.log("FlexiCRM Server Starting...");
 
+  // Netlify domain
+  app.use(
+    cors({
+      origin: "https://boisterous-chebakia-842de7.netlify.app",
+    })
+  );
   // Add authMiddleware as global middleware
   app.use(authMiddleware);
 
