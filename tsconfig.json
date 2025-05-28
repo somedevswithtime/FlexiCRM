@@ -37,5 +37,5 @@
     ".next/types/**/*.ts",
     "server/tsconfig.json"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["server", "scripts", "node_modules"]
 }
