@@ -22,9 +22,7 @@ export default function DnDManagerPage() {
           `${API_URL}${process.env.NEXT_PUBLIC_DEFAULT_PLAYER_SCHEMA_ID}`
         );
         const result = await response.json();
-        setFetchedSchema(result.data);
-        console.log(result.data);
-        console.log(playerSchema);
+        setFetchedSchema(result);
       } catch (error) {
         console.error("Failed to fetch schema:", error);
         console.log("Loading local player schema.");
