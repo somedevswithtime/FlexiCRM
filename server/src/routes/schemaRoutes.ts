@@ -1,18 +1,15 @@
-import express from "express"; // Keep Request and Response scoped to express
+import { Router, Request, Response } from "express";
 import {
   getSchemaById,
   getAllAccessibleSchemas,
 } from "@/services/entitySchemaService";
 
-const router = express.Router();
-
-// TODO: type errors
+const router = Router();
 
 // GET /api/schemas/:schemaId
-// Explicitly type req and res using express.Request and express.Response
 const getSchemaByIdHandler = async (
-  req: express.Request<{ schemaId: string }, any, any, any>,
-  res: express.Response
+  req: Request<{ schemaId: string }, any, any, any>,
+  res: Response
 ) => {
   const { schemaId } = req.params;
   try {
@@ -46,16 +43,11 @@ const getSchemaByIdHandler = async (
 router.get("/:schemaId", getSchemaByIdHandler);
 
 // GET /api/schemas
-// Explicitly type req and res using express.Request and express.Response
-const getAllAccessibleSchemasHandler = async (
-  req: express.Request,
-  res: express.Response
-) => {
+const getAllAccessibleSchemasHandler = async (req: Request, res: Response) => {
   try {
     const { data: schemas, error } = await getAllAccessibleSchemas();
 
     if (error) {
-      // Supabase errors were already logged in the service
       return res
         .status(500)
         .json({ message: "Error fetching schemas.", error: error.message });
@@ -69,6 +61,7 @@ const getAllAccessibleSchemasHandler = async (
       .json({ message: "Internal server error.", error: err.message });
   }
 };
+
 router.get("/", getAllAccessibleSchemasHandler);
 
 export default router;
