@@ -23,6 +23,8 @@ export default function DnDManagerPage() {
         );
         const result = await response.json();
         setFetchedSchema(result.data);
+        console.log(result.data);
+        console.log(playerSchema);
       } catch (error) {
         console.error("Failed to fetch schema:", error);
         console.log("Loading local player schema.");
