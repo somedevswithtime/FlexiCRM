@@ -1,5 +1,8 @@
 import express, { Request, Response } from "express";
-import { getAllSchemas } from "./services/entitySchemaService";
+import {
+  getAllAccessibleSchemas,
+  getSchemaById,
+} from "@/services/entitySchemaService";
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -13,7 +16,7 @@ async function main() {
 
   app.get("/api/schemas", async (req: Request, res: Response) => {
     try {
-      const schemas = await getAllSchemas();
+      const schemas = await getAllAccessibleSchemas();
       res.status(200).json(schemas);
     } catch (error) {
       console.error("Error fetching schemas:", error);

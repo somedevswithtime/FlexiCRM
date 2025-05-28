@@ -1,29 +1,28 @@
-import { supabase } from "../lib/supabaseClient";
-import { EntitySchema } from "../lib/crm-core";
+import { supabase } from "@/supabaseClient";
 
-export const getAllSchemas = async (): Promise<EntitySchema[]> => {
-  const { data, error } = await supabase.from("entity_schemas").select("*");
-
-  if (error) {
-    console.error("Error fetching schemas:", error);
-    throw error;
-  }
-  return data as EntitySchema[];
-};
-
-export const getSchemaById = async (
-  id: string
-): Promise<EntitySchema | null> => {
+export const getSchemaById = async (schemaId: string) => {
   const { data, error } = await supabase
     .from("entity_schemas")
     .select("*")
-    .eq("id", id)
-    .single(); // .single() expects one row or null
+    .eq("id", schemaId)
+    .single();
 
   if (error && error.code !== "PGRST116") {
-    // PGRST116: Row not found by .single()
+    // PGRST116: Row not found, which is a valid case
     console.error("Error fetching schema by ID:", error);
-    throw error;
+    throw new Error(`Supabase error: ${error.message}`);
   }
-  return data as EntitySchema | null;
+
+  return { data, error }; // error will be null if found, or PostgrestError if not found (PGRST116)
+};
+
+export const getAllAccessibleSchemas = async () => {
+  const { data, error } = await supabase.from("entity_schemas").select("*");
+
+  if (error) {
+    console.error("Error fetching all accessible schemas:", error);
+    throw new Error(`Supabase error: ${error.message}`);
+  }
+
+  return { data, error: null }; // error will be null on success
 };
