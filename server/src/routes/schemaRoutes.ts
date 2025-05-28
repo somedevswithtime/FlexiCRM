@@ -1,4 +1,4 @@
-import express from "express";
+import express from "express"; // Keep Request and Response scoped to express
 import {
   getSchemaById,
   getAllAccessibleSchemas,
@@ -6,26 +6,29 @@ import {
 
 const router = express.Router();
 
+// TODO: type errors
+
 // GET /api/schemas/:schemaId
-router.get("/:schemaId", async (req, res) => {
+// Explicitly type req and res using express.Request and express.Response
+const getSchemaByIdHandler = async (
+  req: express.Request<{ schemaId: string }, any, any, any>,
+  res: express.Response
+) => {
   const { schemaId } = req.params;
   try {
     const { data: schema, error } = await getSchemaById(schemaId);
 
-    if (error && error.code === "PGRST116") {
-      // Row not found
+    if (error?.code === "PGRST116") {
       return res
         .status(404)
         .json({ message: "Schema not found or not accessible." });
     } else if (error) {
-      // Other Supabase errors were already logged in the service
       return res
         .status(500)
         .json({ message: "Error fetching schema.", error: error.message });
     }
 
     if (!schema) {
-      // Should be covered by PGRST116, but as a fallback
       return res
         .status(404)
         .json({ message: "Schema not found or not accessible." });
@@ -38,10 +41,16 @@ router.get("/:schemaId", async (req, res) => {
       .status(500)
       .json({ message: "Internal server error.", error: err.message });
   }
-});
+};
+
+router.get("/:schemaId", getSchemaByIdHandler);
 
 // GET /api/schemas
-router.get("/", async (req, res) => {
+// Explicitly type req and res using express.Request and express.Response
+const getAllAccessibleSchemasHandler = async (
+  req: express.Request,
+  res: express.Response
+) => {
   try {
     const { data: schemas, error } = await getAllAccessibleSchemas();
 
@@ -59,6 +68,7 @@ router.get("/", async (req, res) => {
       .status(500)
       .json({ message: "Internal server error.", error: err.message });
   }
-});
+};
+router.get("/", getAllAccessibleSchemasHandler);
 
 export default router;

@@ -1,8 +1,6 @@
 import express, { Request, Response } from "express";
-import {
-  getAllAccessibleSchemas,
-  getSchemaById,
-} from "@/services/entitySchemaService";
+import { authMiddleware } from "@/middleware/authMiddleware"; // Corrected import
+import schemaRoutes from "@/routes/schemaRoutes"; // Added import
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -10,18 +8,15 @@ const port = process.env.PORT || 3001;
 async function main() {
   console.log("FlexiCRM Server Starting...");
 
+  // Add authMiddleware as global middleware
+  app.use(authMiddleware);
+
+  // Mount schemaRoutes
+  app.use("/api/schemas", schemaRoutes);
+
+  // Add new health check route
   app.get("/api", (req: Request, res: Response) => {
     res.json({ message: "FlexiCRM Backend is running!" });
-  });
-
-  app.get("/api/schemas", async (req: Request, res: Response) => {
-    try {
-      const schemas = await getAllAccessibleSchemas();
-      res.status(200).json(schemas);
-    } catch (error) {
-      console.error("Error fetching schemas:", error);
-      res.status(500).json({ message: "Failed to fetch schemas" });
-    }
   });
 
   app.listen(port, () => {

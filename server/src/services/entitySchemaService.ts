@@ -21,8 +21,7 @@ export const getAllAccessibleSchemas = async () => {
 
   if (error) {
     console.error("Error fetching all accessible schemas:", error);
-    throw new Error(`Supabase error: ${error.message}`);
   }
 
-  return { data, error: null }; // error will be null on success
+  return { data, error }; // error will be null on success, or the Supabase error object on failure
 };
