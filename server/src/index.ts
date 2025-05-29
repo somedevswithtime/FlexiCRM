@@ -1,7 +1,9 @@
 import express, { Request, Response } from "express";
-import { authMiddleware } from "@/middleware/authMiddleware";
 import cors from "cors";
+import { authMiddleware } from "@/middleware/authMiddleware";
+import { NETLIFY_URL } from "@/lib/constants";
 import schemaRoutes from "@/routes/schemaRoutes"; // Added import
+import instanceRoutes from "@/routes/instanceRoutes"; // Import instance routes
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -12,7 +14,7 @@ async function main() {
   // Netlify domain
   app.use(
     cors({
-      origin: "https://boisterous-chebakia-842de7.netlify.app",
+      origin: NETLIFY_URL,
     })
   );
   // Add authMiddleware as global middleware
@@ -20,6 +22,9 @@ async function main() {
 
   // Mount schemaRoutes
   app.use("/api/schemas", schemaRoutes);
+
+  // Mount instanceRoutes
+  app.use("/api/instances", instanceRoutes);
 
   // Add new health check route
   app.get("/api", (req: Request, res: Response) => {
