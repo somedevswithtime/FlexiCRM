@@ -48,7 +48,7 @@ export default function DnDManagerPage() {
         }
         const result = await response.json();
         // Ensure the fetched data is an array, Supabase might return an object with a data property
-        setPlayers(Array.isArray(result) ? result : result.data || []);
+        setPlayers(Array.isArray(result) ? result : result || []);
       } catch (error) {
         console.error("Failed to fetch players:", error);
         setPlayers([]); // Set to empty array on error
