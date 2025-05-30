@@ -1,6 +1,6 @@
 import type { EntityInstance } from "@/src/core/types";
 
-export const API_URL = "https://flexicrm-backend.onrender.com/api/schemas/";
+export const API_URL = "https://flexicrm-backend.onrender.com/api";
 
 export const mockedPlayers: EntityInstance[] = [
   {
