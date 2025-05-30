@@ -8,7 +8,7 @@ export const mockedPlayers: EntityInstance[] = [
     createdAt: Date.now(),
     schemaId: "player_schema_v001",
     name: "Thalia",
-    fieldValues: [
+    field_values: [
       {
         fieldId: "player_field_name",
         name: "Character Name",
@@ -85,7 +85,7 @@ export const mockedPlayers: EntityInstance[] = [
     createdAt: Date.now(),
     schemaId: "player_schema_v001",
     name: "Garruk",
-    fieldValues: [
+    field_values: [
       {
         fieldId: "player_field_name",
         name: "Character Name",

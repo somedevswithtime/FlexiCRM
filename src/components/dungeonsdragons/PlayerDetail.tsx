@@ -26,7 +26,7 @@ export function PlayerDetail({ player, schema }: PlayerDetailProps) {
   // Grouping fields by uiGroup
   const groupedFields: Record<string, GroupedField[]> = {};
 
-  player.fieldValues.forEach((fv) => {
+  player.field_values.forEach((fv) => {
     const definition = fieldDefMap.get(fv.fieldId);
     if (definition) {
       const groupName = definition.uiGroup || "Other Details";
