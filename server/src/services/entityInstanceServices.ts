@@ -9,7 +9,6 @@ interface EntityInstance {
 }
 
 export async function getAllInstances(
-  userId: string,
   schemaId: string
 ): Promise<{ data: EntityInstance[] | null; error: any }> {
   try {
@@ -18,13 +17,13 @@ export async function getAllInstances(
       .select(
         `
         *,
-        user_instance_permissions!inner (
-          user_id
+        user_instance_permissions (
+          permission_level
         )
       `
       )
       .eq("schema_id", schemaId)
-      .eq("user_instance_permissions.user_id", userId);
+      .order("created_at", { ascending: false });
 
     if (error) {
       console.error("Error fetching entity instances:", error);

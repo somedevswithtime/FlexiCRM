@@ -3,17 +3,15 @@ import { getAllInstances } from "@/services/entityInstanceServices";
 
 const router = Router();
 
-router.get("/:schemaId/:userId", async (req: Request, res: Response) => {
-  const { schemaId, userId } = req.params;
+router.get("/:schemaId", async (req: Request, res: Response) => {
+  const { schemaId } = req.params;
 
-  if (!schemaId || !userId) {
-    return res
-      .status(400)
-      .json({ error: "Missing schemaId or userId parameter" });
+  if (!schemaId) {
+    return res.status(400).json({ error: "Missing schemaId parameter" });
   }
 
   try {
-    const { data, error } = await getAllInstances(userId, schemaId);
+    const { data, error } = await getAllInstances(schemaId);
 
     if (error) {
       console.error("Error fetching instances:", error);
