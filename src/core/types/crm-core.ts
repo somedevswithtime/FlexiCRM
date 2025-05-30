@@ -4,6 +4,8 @@ interface BaseEntity {
   updatedAt?: number;
 }
 
+// TODO: types not correct what's defined on backend, need a way to auto this
+
 /**
  * Defines the possible data types for a field.
  */
@@ -125,7 +127,7 @@ export interface EntityInstance extends BaseEntity {
    * Some entities might derive their name from a specific field.
    */
   name?: string; // Primary display name, title for the instance
-  fieldValues: TypedFieldValue[]; // Now uses the strongly-typed discriminated union
+  field_values: TypedFieldValue[]; // Now uses the strongly-typed discriminated union
 }
 
 /**

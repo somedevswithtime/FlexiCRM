@@ -36,7 +36,7 @@ export function PlayerTable({ players, schema, onSelect }: PlayerTableProps) {
         <tbody>
           {players.map((player) => {
             const playerFieldValuesMap = new Map<string, TypedFieldValue>(
-              player.fieldValues.map((fv) => [fv.fieldId, fv])
+              player.field_values.map((fv) => [fv.fieldId, fv])
             );
             return (
               <tr
