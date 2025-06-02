@@ -5,4 +5,8 @@ export const DEMO_SCHEMA_INFO = {
     name: "playerSchema",
     id: process.env.NEXT_PUBLIC_DEFAULT_PLAYER_SCHEMA_ID,
   },
+  freelanceSchema: {
+    name: "freelanceSchema",
+    id: process.env.NEXT_PUBLIC_DEFAULT_FREELANCE_SCHEMA_ID,
+  },
 };
