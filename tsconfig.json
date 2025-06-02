@@ -27,7 +27,8 @@
       "@schemas/*": ["src/schemas/*"],
       "@core/*": ["src/core/*"],
       "@utils/*": ["src/lib/utils/*"],
-      "@utils": ["src/lib/utils/index.ts"]
+      "@utils": ["src/lib/utils/index.ts"],
+      "@hooks/*": ["src/hooks/*"]
     }
   },
   "include": [

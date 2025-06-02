@@ -19,7 +19,7 @@ const Landing: FC = () => {
             <p className="text-gray-600">Organize applications</p>
           </div>
           <div className="card">
-            <Link href="/demo/dungeonsdragons">
+            <Link href="/demo/playerSchema">
               <h2 className="text-xl font-semibold mb-3">For Gamers</h2>
               <p className="text-gray-600">
                 Manage gaming sessions, click here
