@@ -1,5 +1,9 @@
 import { Router, Request, Response } from "express";
-import { getAllInstances } from "@/services/entityInstanceServices";
+import {
+  getAllInstances,
+  createInstance,
+} from "@/services/entityInstanceServices";
+import { DEFAULT_DEMO_USER_ID } from "@/lib/constants";
 
 const router = Router();
 
@@ -32,6 +36,50 @@ router.get("/:schemaId", async (req: Request, res: Response) => {
     return res.status(200).json(data);
   } catch (err) {
     console.error("Unexpected error in instance route:", err);
+    return res.status(500).json({ error: "An unexpected error occurred" });
+  }
+});
+
+// POST route
+router.post("/:schemaId", async (req: Request, res: Response) => {
+  const { schemaId } = req.params;
+  const instanceData = req.body;
+
+  // Determine userId: use authenticated user if available, otherwise fallback to demo user
+  // Casting req to any to access user property, assuming it's added by authMiddleware
+  const userIdFromAuth = (req as any).user?.id;
+  const userId = userIdFromAuth || DEFAULT_DEMO_USER_ID;
+
+  if (!schemaId) {
+    return res.status(400).json({ error: "Missing schemaId parameter" });
+  }
+
+  if (!userId) {
+    return res.status(400).json({ error: "User ID could not be determined" });
+  }
+
+  if (!instanceData || Object.keys(instanceData).length === 0) {
+    return res
+      .status(400)
+      .json({ error: "Missing instance data in request body" });
+  }
+
+  try {
+    const { data: newInstance, error } = await createInstance(
+      schemaId,
+      userId,
+      instanceData
+    );
+
+    if (error) {
+      console.error("Error creating instance:", error);
+      // Check for specific Supabase errors if needed, e.g., foreign key violation if schemaId is invalid
+      return res.status(500).json({ error: "Failed to create instance" });
+    }
+
+    return res.status(201).json(newInstance);
+  } catch (err) {
+    console.error("Unexpected error in instance POST route:", err);
     return res.status(500).json({ error: "An unexpected error occurred" });
   }
 });
