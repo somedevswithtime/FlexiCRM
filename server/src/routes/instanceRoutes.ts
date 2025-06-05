@@ -10,37 +10,41 @@ const router = Router();
 
 router.get("/:schemaId", async (req: AuthenticatedRequest, res: Response) => {
   const { schemaId } = req.params;
-  const userAccessToken = req.token;
-  const userIdFromAuth = req.user?.id; // For determining if we *should* have a token
+  const userAccessToken = req.token; // Might be undefined if no Authorization header
+  const userIdFromAuth = req.user?.id; // From a valid JWT, if present
+
+  // Determine the user ID for the operation: authenticated user or demo user.
+  const userId = userIdFromAuth || DEFAULT_DEMO_USER_ID;
 
   if (!schemaId) {
     return res.status(400).json({ error: "Missing schemaId parameter" });
   }
 
-  // If authenticated user, token must be present
+  // Scenario 1: Authenticated user is present (userIdFromAuth exists).
+  // In this case, a token MUST be provided.
   if (userIdFromAuth && !userAccessToken) {
     return res
       .status(401)
-      .json({ error: "Unauthorized: Missing token for authenticated user" });
+      .json({ error: "Unauthorized: Missing token for authenticated user." });
   }
 
-  if (!userIdFromAuth && !DEFAULT_DEMO_USER_ID && !userAccessToken) {
-    return res
-      .status(400)
-      .json({ error: "Cannot determine user or access token." });
+  // Scenario 2: No authenticated user (userIdFromAuth is null).
+  // Try DEFAULT_DEMO_USER_ID
+  if (!userId) {
+    return res.status(400).json({
+      error:
+        "User ID could not be determined (no authenticated user and no demo user configured).",
+    });
   }
 
-  // If no token, and we are relying on demo user, userAccessToken will be undefined.
-  // The service function needs to handle undefined token for demo user scenarios.
   const effectiveToken = userIdFromAuth ? userAccessToken : undefined;
 
   try {
-    const { data, error } = await getAllInstances(schemaId, effectiveToken!);
+    // effectiveToken can be undefined here for demo users; service layer handles it.
+    const { data, error } = await getAllInstances(schemaId, effectiveToken);
 
     if (error) {
       console.error("Error fetching instances:", error);
-      // Differentiate between "not found" and other errors if possible
-      // For now, treating all errors from service as potential server errors or not found
       if (error.message.includes("not found")) {
         return res.status(404).json({ error: "Instances not found" });
       }
@@ -64,30 +68,38 @@ router.get("/:schemaId", async (req: AuthenticatedRequest, res: Response) => {
 router.post("/:schemaId", async (req: AuthenticatedRequest, res: Response) => {
   const { schemaId } = req.params;
   const instanceData = req.body;
-  const userAccessToken = req.token;
-  const userIdFromAuth = req.user?.id;
+  const userAccessToken = req.token; // Might be undefined
+  const userIdFromAuth = req.user?.id; // From a valid JWT, if present
+
+  // Determine the user ID for the operation: authenticated user or demo user.
   const userId = userIdFromAuth || DEFAULT_DEMO_USER_ID;
 
   if (!schemaId) {
     return res.status(400).json({ error: "Missing schemaId parameter" });
   }
 
-  // If authenticated user, token must be present
+  // Scenario 1: Authenticated user is present (userIdFromAuth exists).
+  // In this case, a token MUST be provided.
   if (userIdFromAuth && !userAccessToken) {
     return res
       .status(401)
-      .json({ error: "Unauthorized: Missing token for authenticated user" });
+      .json({ error: "Unauthorized: Missing token for authenticated user." });
   }
 
-  // If no userId can be determined (neither auth nor demo), it's an issue.
+  // Scenario 2: No authenticated user (userIdFromAuth is null).
+  // We might be operating as a demo user if DEFAULT_DEMO_USER_ID is configured.
+  // If neither userIdFromAuth nor DEFAULT_DEMO_USER_ID is available, we cannot proceed.
   if (!userId) {
     return res.status(400).json({
-      error: "User ID could not be determined and no demo user configured.",
+      error:
+        "User ID could not be determined (no authenticated user and no demo user configured).",
     });
   }
 
-  // If no token, and we are relying on demo user, userAccessToken will be undefined.
-  // The service function needs to handle undefined token for demo user scenarios.
+  // The effectiveToken is passed to the service layer.
+  // If userIdFromAuth is present, effectiveToken is userAccessToken (which we've asserted is present).
+  // If userIdFromAuth is null (i.e., we're using DEFAULT_DEMO_USER_ID), effectiveToken will be undefined.
+  // The service layer is responsible for handling an undefined token by using a service role client.
   const effectiveToken = userIdFromAuth ? userAccessToken : undefined;
 
   if (!instanceData || Object.keys(instanceData).length === 0) {

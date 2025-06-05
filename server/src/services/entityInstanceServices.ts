@@ -1,4 +1,7 @@
-import { createSupabaseServerClient } from "@/supabaseClient";
+import {
+  createSupabaseServerClient,
+  supabaseServiceClient,
+} from "@/supabaseClient";
 
 interface EntityInstance {
   id: string;
@@ -11,10 +14,12 @@ interface EntityInstance {
 
 export async function getAllInstances(
   schemaId: string,
-  userAccessToken: string
+  userAccessToken: string | undefined
 ): Promise<{ data: EntityInstance[] | null; error: any }> {
   try {
-    const supabase = createSupabaseServerClient(userAccessToken);
+    const supabase = userAccessToken
+      ? createSupabaseServerClient(userAccessToken)
+      : supabaseServiceClient; // TODO: research better ways
 
     const { data, error } = await supabase
       .from("entity_instances")
@@ -45,10 +50,12 @@ export async function createInstance(
   schemaId: string,
   userId: string,
   instanceData: any,
-  userAccessToken: string
+  userAccessToken: string | undefined
 ): Promise<{ data: EntityInstance | null; error: any }> {
   try {
-    const supabase = createSupabaseServerClient(userAccessToken);
+    const supabase = userAccessToken
+      ? createSupabaseServerClient(userAccessToken)
+      : supabaseServiceClient; // TODO: research better ways
 
     const { data, error } = await supabase
       .from("entity_instances")
