@@ -1,11 +1,16 @@
-import { createSupabaseServerClient } from "@/supabaseClient";
+import {
+  createSupabaseServerClient,
+  supabaseServiceClient,
+} from "@/supabaseClient";
 
 export const getSchemaById = async (
   schemaId: string,
-  userAccessToken: string
+  userAccessToken: string | undefined
 ) => {
   try {
-    const supabase = createSupabaseServerClient(userAccessToken);
+    const supabase = userAccessToken
+      ? createSupabaseServerClient(userAccessToken)
+      : supabaseServiceClient;
 
     const { data, error } = await supabase
       .from("entity_schemas")
@@ -25,9 +30,13 @@ export const getSchemaById = async (
   }
 };
 
-export const getAllAccessibleSchemas = async (userAccessToken: string) => {
+export const getAllAccessibleSchemas = async (
+  userAccessToken: string | undefined
+) => {
   try {
-    const supabase = createSupabaseServerClient(userAccessToken);
+    const supabase = userAccessToken
+      ? createSupabaseServerClient(userAccessToken)
+      : supabaseServiceClient;
 
     const { data, error } = await supabase.from("entity_schemas").select("*");
 

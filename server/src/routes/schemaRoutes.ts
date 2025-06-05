@@ -17,9 +17,7 @@ const getSchemaByIdHandler = async (
   const userAccessToken = req.token;
 
   if (!userAccessToken) {
-    return res
-      .status(401)
-      .json({ message: "Unauthorized: Access token is required" });
+    console.warn("Unauthorized: Proceeding as anonymous");
   }
 
   try {
@@ -75,9 +73,7 @@ const getAllAccessibleSchemasHandler = async (
   const userAccessToken = req.token;
 
   if (!userAccessToken) {
-    return res
-      .status(401)
-      .json({ message: "Unauthorized: Access token is required" });
+    console.warn("Unauthorized: Proceeding as anonymous");
   }
 
   try {
