@@ -19,7 +19,7 @@ export async function getAllInstances(
   try {
     const supabase = userAccessToken
       ? createSupabaseServerClient(userAccessToken)
-      : supabaseServiceClient; // TODO: research better ways
+      : supabaseServiceClient;
 
     const { data, error } = await supabase
       .from("entity_instances")
@@ -55,7 +55,9 @@ export async function createInstance(
   try {
     const supabase = userAccessToken
       ? createSupabaseServerClient(userAccessToken)
-      : supabaseServiceClient; // TODO: research better ways
+      : supabaseServiceClient;
+
+    const { name, ...otherInstanceData } = instanceData; // Destructure name
 
     const { data, error } = await supabase
       .from("entity_instances")
@@ -63,7 +65,8 @@ export async function createInstance(
         {
           schema_id: schemaId,
           user_id: userId,
-          data: instanceData,
+          name: name, // Use destructured name
+          field_values: otherInstanceData, // Use the rest for field_values
         },
       ])
       .select()
