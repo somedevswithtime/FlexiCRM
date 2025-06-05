@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { supabase } from "@/supabaseClient";
+import { supabaseServiceClient } from "@/supabaseClient";
 
 export const authMiddleware = async (
   req: Request,
@@ -15,16 +15,17 @@ export const authMiddleware = async (
     const {
       data: { user },
       error,
-    } = await supabase.auth.getUser(token);
-    if (error || !user) {
+    } = await supabaseServiceClient.auth.getUser(token);
+
+    if (user) {
+      (req as any).user = user;
+    } else {
       console.warn(
         `[AuthMiddleware] JWT token provided but failed to authenticate: ${
           error?.message || "No user object returned."
         }. Proceeding as anonymous.`
       );
     }
-    // The Supabase client instance will use the token from the header for RLS if properly configured.
-    // No need to call setAuth on the shared client.
   }
 
   next();

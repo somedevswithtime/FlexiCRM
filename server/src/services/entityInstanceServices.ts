@@ -1,4 +1,5 @@
-import { supabase } from "@/supabaseClient";
+import { createSupabaseServerClient } from "@/supabaseClient";
+import { Request } from "express";
 
 interface EntityInstance {
   id: string;
@@ -10,9 +11,12 @@ interface EntityInstance {
 }
 
 export async function getAllInstances(
-  schemaId: string
+  schemaId: string,
+  userAccessToken: string
 ): Promise<{ data: EntityInstance[] | null; error: any }> {
   try {
+    const supabase = createSupabaseServerClient(userAccessToken);
+
     const { data, error } = await supabase
       .from("entity_instances")
       .select(
@@ -41,9 +45,12 @@ export async function getAllInstances(
 export async function createInstance(
   schemaId: string,
   userId: string,
-  instanceData: any
+  instanceData: any,
+  userAccessToken: string
 ): Promise<{ data: EntityInstance | null; error: any }> {
   try {
+    const supabase = createSupabaseServerClient(userAccessToken);
+
     const { data, error } = await supabase
       .from("entity_instances")
       .insert([
@@ -53,8 +60,8 @@ export async function createInstance(
           data: instanceData,
         },
       ])
-      .select() // Return the inserted row
-      .single(); // Expect a single row to be returned
+      .select()
+      .single();
 
     if (error) {
       console.error("Error creating entity instance:", error);
