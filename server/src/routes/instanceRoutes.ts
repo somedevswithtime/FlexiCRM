@@ -1,4 +1,5 @@
-import { Router, Request, Response } from "express";
+import { Router, Response } from "express";
+import { AuthenticatedRequest } from "@/middleware/authMiddleware";
 import {
   getAllInstances,
   createInstance,
@@ -7,15 +8,34 @@ import { DEFAULT_DEMO_USER_ID } from "@/lib/constants";
 
 const router = Router();
 
-router.get("/:schemaId", async (req: Request, res: Response) => {
+router.get("/:schemaId", async (req: AuthenticatedRequest, res: Response) => {
   const { schemaId } = req.params;
+  const userAccessToken = req.token;
+  const userIdFromAuth = req.user?.id; // For determining if we *should* have a token
 
   if (!schemaId) {
     return res.status(400).json({ error: "Missing schemaId parameter" });
   }
 
+  // If authenticated user, token must be present
+  if (userIdFromAuth && !userAccessToken) {
+    return res
+      .status(401)
+      .json({ error: "Unauthorized: Missing token for authenticated user" });
+  }
+
+  if (!userIdFromAuth && !DEFAULT_DEMO_USER_ID && !userAccessToken) {
+    return res
+      .status(400)
+      .json({ error: "Cannot determine user or access token." });
+  }
+
+  // If no token, and we are relying on demo user, userAccessToken will be undefined.
+  // The service function needs to handle undefined token for demo user scenarios.
+  const effectiveToken = userIdFromAuth ? userAccessToken : undefined;
+
   try {
-    const { data, error } = await getAllInstances(schemaId);
+    const { data, error } = await getAllInstances(schemaId, effectiveToken!);
 
     if (error) {
       console.error("Error fetching instances:", error);
@@ -41,22 +61,34 @@ router.get("/:schemaId", async (req: Request, res: Response) => {
 });
 
 // POST route
-router.post("/:schemaId", async (req: Request, res: Response) => {
+router.post("/:schemaId", async (req: AuthenticatedRequest, res: Response) => {
   const { schemaId } = req.params;
   const instanceData = req.body;
-
-  // Determine userId: use authenticated user if available, otherwise fallback to demo user
-  // Casting req to any to access user property, assuming it's added by authMiddleware
-  const userIdFromAuth = (req as any).user?.id;
+  const userAccessToken = req.token;
+  const userIdFromAuth = req.user?.id;
   const userId = userIdFromAuth || DEFAULT_DEMO_USER_ID;
 
   if (!schemaId) {
     return res.status(400).json({ error: "Missing schemaId parameter" });
   }
 
-  if (!userId) {
-    return res.status(400).json({ error: "User ID could not be determined" });
+  // If authenticated user, token must be present
+  if (userIdFromAuth && !userAccessToken) {
+    return res
+      .status(401)
+      .json({ error: "Unauthorized: Missing token for authenticated user" });
   }
+
+  // If no userId can be determined (neither auth nor demo), it's an issue.
+  if (!userId) {
+    return res.status(400).json({
+      error: "User ID could not be determined and no demo user configured.",
+    });
+  }
+
+  // If no token, and we are relying on demo user, userAccessToken will be undefined.
+  // The service function needs to handle undefined token for demo user scenarios.
+  const effectiveToken = userIdFromAuth ? userAccessToken : undefined;
 
   if (!instanceData || Object.keys(instanceData).length === 0) {
     return res
@@ -68,7 +100,8 @@ router.post("/:schemaId", async (req: Request, res: Response) => {
     const { data: newInstance, error } = await createInstance(
       schemaId,
       userId,
-      instanceData
+      instanceData,
+      effectiveToken
     );
 
     if (error) {

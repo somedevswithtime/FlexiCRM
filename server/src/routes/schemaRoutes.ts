@@ -1,4 +1,6 @@
-import { Router, Request, Response } from "express";
+import { Router, Response } from "express";
+import { PostgrestError } from "@supabase/supabase-js";
+import { AuthenticatedRequest } from "../middleware/authMiddleware";
 import {
   getSchemaById,
   getAllAccessibleSchemas,
@@ -8,21 +10,44 @@ const router = Router();
 
 // GET /api/schemas/:schemaId
 const getSchemaByIdHandler = async (
-  req: Request<{ schemaId: string }, any, any, any>,
+  req: AuthenticatedRequest,
   res: Response
 ) => {
-  const { schemaId } = req.params;
-  try {
-    const { data: schema, error } = await getSchemaById(schemaId);
+  const { schemaId } = req.params as { schemaId: string }; // Ensure schemaId is typed
+  const userAccessToken = req.token;
 
-    if (error?.code === "PGRST116") {
-      return res
-        .status(404)
-        .json({ message: "Schema not found or not accessible." });
-    } else if (error) {
+  if (!userAccessToken) {
+    return res
+      .status(401)
+      .json({ message: "Unauthorized: Access token is required" });
+  }
+
+  try {
+    const { data: schema, error } = await getSchemaById(
+      schemaId,
+      userAccessToken
+    );
+
+    // todo: cleaner way?
+    if (error) {
+      if (typeof error === "object" && error !== null && "code" in error) {
+        const pgError = error as PostgrestError;
+
+        if (pgError.code === "PGRST116") {
+          return res
+            .status(404)
+            .json({ message: "Schema not found or not accessible." });
+        }
+
+        return res
+          .status(500)
+          .json({ message: "Error fetching schema.", error: pgError.message });
+      }
+
+      // Fallback for unexpected error shape
       return res
         .status(500)
-        .json({ message: "Error fetching schema.", error: error.message });
+        .json({ message: "Unknown error fetching schema." });
     }
 
     if (!schema) {
@@ -43,14 +68,31 @@ const getSchemaByIdHandler = async (
 router.get("/:schemaId", getSchemaByIdHandler);
 
 // GET /api/schemas
-const getAllAccessibleSchemasHandler = async (req: Request, res: Response) => {
-  try {
-    const { data: schemas, error } = await getAllAccessibleSchemas();
+const getAllAccessibleSchemasHandler = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  const userAccessToken = req.token;
 
+  if (!userAccessToken) {
+    return res
+      .status(401)
+      .json({ message: "Unauthorized: Access token is required" });
+  }
+
+  try {
+    const { data: schemas, error } = await getAllAccessibleSchemas(
+      userAccessToken
+    );
+
+    // todo: cleaner way?
     if (error) {
-      return res
-        .status(500)
-        .json({ message: "Error fetching schemas.", error: error.message });
+      if (typeof error === "object" && error !== null && "code" in error) {
+        const pgError = error as PostgrestError;
+        return res
+          .status(500)
+          .json({ message: "Error fetching schemas.", error: pgError.message });
+      }
     }
 
     return res.status(200).json(schemas);

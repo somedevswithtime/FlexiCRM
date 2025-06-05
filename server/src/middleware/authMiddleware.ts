@@ -1,8 +1,14 @@
-import { Request, Response, NextFunction } from "express";
-import { supabaseServiceClient } from "@/supabaseClient";
+import { Request as ExpressRequest, Response, NextFunction } from "express";
+import { User } from "@supabase/supabase-js";
+import { createSupabaseServerClient } from "@/supabaseClient";
+
+export interface AuthenticatedRequest extends ExpressRequest {
+  user?: User;
+  token?: string;
+}
 
 export const authMiddleware = async (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -12,21 +18,27 @@ export const authMiddleware = async (
     : null;
 
   if (token) {
+    const supabaseClient = createSupabaseServerClient(token);
     const {
       data: { user },
       error,
-    } = await supabaseServiceClient.auth.getUser(token);
+    } = await supabaseClient.auth.getUser();
 
-    if (user) {
-      (req as any).user = user;
-    } else {
+    if (error || !user) {
       console.warn(
-        `[AuthMiddleware] JWT token provided but failed to authenticate: ${
+        `[AuthMiddleware] Authentication error: ${
           error?.message || "No user object returned."
-        }. Proceeding as anonymous.`
+        }`
       );
+      res.status(401).json({ message: error?.message || "Invalid token" });
+      return; // Terminate response, do not call next()
     }
-  }
 
-  next();
+    // If user exists and no error, attach user to request and proceed
+    req.user = user;
+    req.token = token; // Store the token
+    next();
+  } else {
+    next();
+  }
 };

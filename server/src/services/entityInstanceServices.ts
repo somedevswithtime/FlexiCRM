@@ -1,5 +1,4 @@
 import { createSupabaseServerClient } from "@/supabaseClient";
-import { Request } from "express";
 
 interface EntityInstance {
   id: string;
