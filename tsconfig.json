@@ -28,7 +28,8 @@
       "@core/*": ["src/core/*"],
       "@utils/*": ["src/lib/utils/*"],
       "@utils": ["src/lib/utils/index.ts"],
-      "@hooks/*": ["src/hooks/*"]
+      "@hooks/*": ["src/hooks/*"],
+      "@hooks": ["src/hooks/index.ts"]
     }
   },
   "include": [
