@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import type { EntityInstance, EntitySchema } from "@/src/core/types";
+import { useState, useEffect, useCallback } from "react";
+import type { EntityInstance, EntitySchema } from "@core/types";
 import { API_BASE_URL, DEMO_SCHEMA_INFO } from "@lib/constants";
 
 interface UseSchemaDataReturn {
@@ -9,6 +9,7 @@ interface UseSchemaDataReturn {
   entities: EntityInstance[];
   loading: boolean;
   error: Error | null;
+  refetch: () => Promise<void>;
 }
 
 export function useSchemaData(entityName: string | null): UseSchemaDataReturn {
@@ -17,7 +18,7 @@ export function useSchemaData(entityName: string | null): UseSchemaDataReturn {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
+  const fetchDataCallback = useCallback(async () => {
     if (!entityName || !(entityName in DEMO_SCHEMA_INFO)) {
       setError(new Error(`Invalid or missing entityName: ${entityName}`));
       setSchema(null);
@@ -42,52 +43,62 @@ export function useSchemaData(entityName: string | null): UseSchemaDataReturn {
       return;
     }
 
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
+    setSchema(null);
+    setEntities([]);
+
+    try {
+      // Fetch schema
+      const schemaResponse = await fetch(
+        `${API_BASE_URL}/schemas/${entitySchemaId}`
+      );
+      if (!schemaResponse.ok) {
+        throw new Error(
+          `Schema fetch failed: ${schemaResponse.status} for ${entityName}`
+        );
+      }
+      const fetchedSchema = await schemaResponse.json();
+      setSchema(fetchedSchema);
+
+      // Wonder if refetching schema is necessary at this point in refetch
+      if (fetchedSchema) {
+        const entitiesResponse = await fetch(
+          `${API_BASE_URL}/instances/${entitySchemaId}`
+        );
+        if (!entitiesResponse.ok) {
+          throw new Error(
+            `Instances fetch failed: ${entitiesResponse.status} for ${entityName}`
+          );
+        }
+        const result = await entitiesResponse.json();
+        setEntities(result);
+      } else {
+        setEntities([]);
+      }
+    } catch (e: any) {
+      console.error(`Error fetching data for ${entityName}:`, e.message);
+      setError(e);
       setSchema(null);
       setEntities([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [entityName]); // fetchDataCallback depends on entityName
 
-      try {
-        // Fetch schema
-        const schemaResponse = await fetch(
-          `${API_BASE_URL}/schemas/${entitySchemaId}`
-        );
-        if (!schemaResponse.ok) {
-          throw new Error(
-            `Schema fetch failed: ${schemaResponse.status} for ${entityName}`
-          );
-        }
-        const fetchedSchema = await schemaResponse.json();
-        setSchema(fetchedSchema);
+  useEffect(() => {
+    if (entityName) {
+      // Only run if entityName is present
+      fetchDataCallback(); // Call on mount and when entityName changes (via fetchDataCallback dependency)
+    } else {
+      // Handle the case where entityName is null initially or becomes null
+      setSchema(null);
+      setEntities([]);
+      setLoading(false);
+    }
+  }, [entityName, fetchDataCallback]); // useEffect depends on entityName and fetchDataCallback
 
-        // Fetch entities (only if schema was fetched successfully)
-        if (fetchedSchema) {
-          const entitiesResponse = await fetch(
-            `${API_BASE_URL}/instances/${entitySchemaId}`
-          );
-          if (!entitiesResponse.ok) {
-            throw new Error(
-              `Instances fetch failed: ${entitiesResponse.status} for ${entityName}`
-            );
-          }
-          const result = await entitiesResponse.json();
-          setEntities(result);
-        } else {
-          setEntities([]);
-        }
-      } catch (e: any) {
-        console.error(`Error fetching data for ${entityName}:`, e.message);
-        setError(e);
-        setSchema(null);
-        setEntities([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const refetch = fetchDataCallback; // Alias for external use
 
-    fetchData();
-  }, [entityName]);
-
-  return { schema, entities, loading, error };
+  return { schema, entities, loading, error, refetch };
 }
