@@ -57,7 +57,7 @@ export async function createInstance(
       ? createSupabaseServerClient(userAccessToken)
       : supabaseServiceClient;
 
-    const { name, ...otherInstanceData } = instanceData; // Destructure name
+    const { name, field_values } = instanceData; // Destructure name, need type enforced
 
     const { data, error } = await supabase
       .from("entity_instances")
@@ -66,7 +66,7 @@ export async function createInstance(
           schema_id: schemaId,
           user_id: userId,
           name: name, // Use destructured name
-          field_values: otherInstanceData, // Use the rest for field_values
+          field_values, // Use the rest for field_values
         },
       ])
       .select()
