@@ -1,15 +1,13 @@
 # FlexiCRM – Modular CRM
 
-🌟 **Motivation**: A modular applications with Next.js and modern web technologies. Solution for different user workflows.
+**Motivation**: A modular applications with Next.js and modern web technologies. Solution for different user workflows.
 
-🔍 **What it is**: A customizable CRM that adapts to user needs (Client Manager modes, Freelance work tracker, etc) with dynamic dashboards, task management, and data visualization—all in a single cohesive interface.
+**What it is**: A customizable CRM that adapts to user needs (Client Manager modes, Freelance work tracker, etc) with dynamic dashboards, task management, and data visualization—all in a single cohesive interface.
 
-💻 **Tech**:
-
-**Frontend**  
+**Tech**:
 Next.js · React · TypeScript · Tailwind CSS
 
-## 🚀 Quick Start
+## Quick Start
 
 1. Clone the repo:
 
@@ -30,7 +28,7 @@ npm install
 npm run dev
 ```
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the project
 2. Create your feature branch (git checkout -b feature/AmazingFeature)
