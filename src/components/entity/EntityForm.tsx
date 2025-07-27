@@ -34,13 +34,14 @@ export function EntityForm({
       onSubmitSuccess(submittedData);
       resetForm();
     } catch (error) {
+      // Error is handled in the hook, but you can add extra logic here
       console.error("Submission failed in component:", error);
     }
   };
 
   const groupedFields: Record<string, FieldDefinition[]> = {};
   entitySchema.fields.forEach((field) => {
-    const groupName = field.uiGroup || "Other Details";
+    const groupName = field.uiGroup || "General Information";
     if (!groupedFields[groupName]) {
       groupedFields[groupName] = [];
     }
@@ -50,36 +51,46 @@ export function EntityForm({
     a.localeCompare(b)
   );
 
-  // TODO: break this down
+  const baseInputClasses =
+    "p-2 w-full border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow";
+
   return (
     <form
       onSubmit={handleFormSubmit}
-      className="border border-zinc-300 dark:border-zinc-700 rounded p-4 space-y-6"
+      className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 space-y-8"
     >
-      <h2 className="text-2xl font-semibold mb-4 text-center">
-        Create {entitySchema.name} Demo, all instances will be deleted
-      </h2>
+      <div className="text-center">
+        <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
+          {initialData ? `Edit` : `Create`} {entitySchema.name}
+        </h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          All instances will be deleted periodically.
+        </p>
+      </div>
 
       {sortedGroupNames.map((groupName) => (
-        <div key={groupName} className="mb-4">
-          <h3 className="text-xl font-medium border-b border-zinc-300 dark:border-zinc-600 pb-1 mb-3">
+        <div key={groupName}>
+          <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 border-b-2 border-gray-200 dark:border-gray-600 pb-2 mb-6">
             {groupName}
           </h3>
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             {groupedFields[groupName].map((field) => {
               const inputType = getHtmlInputType(field);
               const fieldId = `field-${entitySchema.id}-${field.id}`;
 
               return (
-                <div key={field.id} className="flex flex-col">
-                  <label htmlFor={fieldId} className="mb-1 font-medium text-sm">
+                <div key={field.id} className="flex flex-col space-y-1">
+                  <label
+                    htmlFor={fieldId}
+                    className="font-medium text-sm text-gray-700 dark:text-gray-300"
+                  >
                     {field.name}
                     {field.isRequired && (
                       <span className="text-red-500 ml-1">*</span>
                     )}
                   </label>
                   {field.description && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       {field.description}
                     </p>
                   )}
@@ -91,7 +102,7 @@ export function EntityForm({
                         handleInputChange(field.id, e.target.value)
                       }
                       required={field.isRequired}
-                      className="p-2 border rounded dark:bg-zinc-800 dark:border-zinc-600 focus:ring-2 focus:ring-blue-500"
+                      className={`${baseInputClasses} h-24`}
                       rows={3}
                     />
                   ) : inputType === "select" ? (
@@ -102,7 +113,7 @@ export function EntityForm({
                         handleInputChange(field.id, e.target.value)
                       }
                       required={field.isRequired}
-                      className="p-2 border rounded dark:bg-zinc-800 dark:border-zinc-600 focus:ring-2 focus:ring-blue-500 h-[42px]"
+                      className={`${baseInputClasses} h-[42px]`}
                     >
                       <option value="" disabled>
                         Select {field.name}
@@ -114,15 +125,17 @@ export function EntityForm({
                       ))}
                     </select>
                   ) : inputType === "checkbox" ? (
-                    <input
-                      type="checkbox"
-                      id={fieldId}
-                      checked={Boolean(formData[field.id])}
-                      onChange={(e) =>
-                        handleInputChange(field.id, e.target.checked)
-                      }
-                      className="h-5 w-5 rounded dark:bg-zinc-800 dark:border-zinc-600 focus:ring-2 focus:ring-blue-500"
-                    />
+                    <div className="flex items-center h-full">
+                      <input
+                        type="checkbox"
+                        id={fieldId}
+                        checked={Boolean(formData[field.id])}
+                        onChange={(e) =>
+                          handleInputChange(field.id, e.target.checked)
+                        }
+                        className="h-5 w-5 rounded text-blue-600 focus:ring-blue-500 border-gray-300"
+                      />
+                    </div>
                   ) : (
                     <input
                       type={inputType}
@@ -132,7 +145,7 @@ export function EntityForm({
                         handleInputChange(field.id, e.target.value)
                       }
                       required={field.isRequired}
-                      className="p-2 border rounded dark:bg-zinc-800 dark:border-zinc-600 focus:ring-2 focus:ring-blue-500"
+                      className={baseInputClasses}
                     />
                   )}
                 </div>
@@ -143,12 +156,12 @@ export function EntityForm({
       ))}
 
       {submitError && (
-        <p className="text-red-500 text-sm text-center">
+        <p className="text-red-500 text-sm font-semibold text-center bg-red-100 p-2 rounded-md">
           Error: {submitError.message}
         </p>
       )}
 
-      <div className="flex justify-end space-x-3 pt-4">
+      <div className="flex justify-end items-center space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
         {onCancel && (
           <button
             type="button"
@@ -156,18 +169,14 @@ export function EntityForm({
               resetForm();
               if (onCancel) onCancel();
             }}
-            className="px-4 py-2 border border-zinc-300 rounded hover:bg-zinc-100 dark:border-zinc-600 dark:hover:bg-zinc-700"
+            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             disabled={isSubmitting}
           >
             Cancel
           </button>
         )}
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Submitting..." : `Submit ${entitySchema.name}`}
+        <button type="submit" className="btn-primary" disabled={isSubmitting}>
+          {isSubmitting ? "Submitting..." : "Submit"}
         </button>
       </div>
     </form>

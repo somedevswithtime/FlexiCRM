@@ -27,33 +27,35 @@ export function EntityTable({
     });
 
   return (
-    <div className="overflow-x-auto border border-zinc-300 dark:border-zinc-700 rounded">
+    <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
       <table className="min-w-full text-left text-sm">
-        <thead className="bg-zinc-100 dark:bg-zinc-800">
+        <thead className="bg-gray-50 dark:bg-gray-700">
           <tr>
             {tableColumns.map((colDef) => (
-              <th key={colDef.id} className="px-4 py-2 font-medium">
+              <th
+                key={colDef.id}
+                className="px-6 py-3 font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider"
+              >
                 {colDef.name}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
           {entities.map((entity) => {
-            // Renamed from 'player' to 'entity'
-            const entityFieldValuesMap = new Map<string, TypedFieldValue>( // Renamed from 'playerFieldValuesMap'
+            const entityFieldValuesMap = new Map<string, TypedFieldValue>(
               entity.field_values.map((fv) => [fv.fieldId, fv])
             );
             return (
               <tr
                 key={entity.id}
-                className="cursor-pointer hover:bg-zinc-200 dark:hover:bg-zinc-700"
-                onClick={() => onSelectEntity(entity.id)} // Updated to use onSelectEntity
+                className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                onClick={() => onSelectEntity(entity.id)}
               >
                 {tableColumns.map((colDef) => {
-                  const fieldValue = entityFieldValuesMap.get(colDef.id); // Updated to use entityFieldValuesMap
+                  const fieldValue = entityFieldValuesMap.get(colDef.id);
                   return (
-                    <td key={colDef.id} className="px-4 py-2">
+                    <td key={colDef.id} className="px-6 py-4 whitespace-nowrap">
                       {getDisplayValue(fieldValue, colDef)}
                     </td>
                   );

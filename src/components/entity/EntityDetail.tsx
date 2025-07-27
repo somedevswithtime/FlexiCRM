@@ -19,19 +19,15 @@ interface GroupedField {
 }
 
 export function EntityDetail({ entity, schema }: EntityDetailProps) {
-  // Renamed component and props
   const fieldDefMap = new Map<string, FieldDefinition>(
     schema.fields.map((field) => [field.id, field])
   );
 
-  // Grouping fields by uiGroup
   const groupedFields: Record<string, GroupedField[]> = {};
-
   entity.field_values.forEach((fv) => {
-    // Renamed from 'player'
     const definition = fieldDefMap.get(fv.fieldId);
     if (definition) {
-      const groupName = definition.uiGroup || "Other Details"; // Default group name
+      const groupName = definition.uiGroup || "Details";
       if (!groupedFields[groupName]) {
         groupedFields[groupName] = [];
       }
@@ -39,30 +35,33 @@ export function EntityDetail({ entity, schema }: EntityDetailProps) {
     }
   });
 
-  // Sort group names alphabetically
   const sortedGroupNames = Object.keys(groupedFields).sort((a, b) =>
     a.localeCompare(b)
   );
 
   return (
-    <div className="border border-zinc-300 dark:border-zinc-700 rounded p-4 space-y-6">
-      <div>
-        <h2 className="text-2xl font-semibold mb-4 text-center">
-          {entity.name || `${schema.name} Details`} {/* Generalized title */}
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 space-y-6">
+      <div className="text-center">
+        <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
+          {entity.name || `${schema.name} Details`}
         </h2>
       </div>
 
       {sortedGroupNames.map((groupName) => (
-        <div key={groupName} className="mb-4">
-          <h3 className="text-xl font-medium border-b border-zinc-300 dark:border-zinc-600 pb-1 mb-2">
+        <div key={groupName}>
+          <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 border-b-2 border-gray-200 dark:border-gray-600 pb-2 mb-4">
             {groupName}
           </h3>
-          <div className="space-y-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {groupedFields[groupName].map(({ definition, fieldValue }) => (
-              <p key={definition.id}>
-                <strong>{definition.name}:</strong>{" "}
-                {getDisplayValue(fieldValue, definition)}
-              </p>
+              <div key={definition.id} className="flex flex-col p-2 rounded-md">
+                <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  {definition.name}
+                </span>
+                <span className="text-md text-gray-800 dark:text-white">
+                  {getDisplayValue(fieldValue, definition)}
+                </span>
+              </div>
             ))}
           </div>
         </div>

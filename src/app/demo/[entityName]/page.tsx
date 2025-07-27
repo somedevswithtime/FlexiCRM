@@ -97,10 +97,7 @@ export default function EntityManagerPage({ params }: EntityManagerPageProps) {
         </h1>
         {fetchedSchema &&
           !showCreateForm && ( // Show button only if schema is loaded and form is not visible
-            <button
-              onClick={handleCreateNew}
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-            >
+            <button onClick={handleCreateNew} className="btn-primary">
               Create New {fetchedSchema.name}
             </button>
           )}
